@@ -17,6 +17,7 @@ import {
 } from "react-native";
 import Qs from "qs";
 import debounce from "lodash.debounce";
+import Geolocation from "@react-native-community/geolocation";
 
 const WINDOW = Dimensions.get("window");
 
@@ -94,8 +95,7 @@ export default class GooglePlacesAutocomplete extends Component {
   getInitialState = () => ({
     text: this.props.getDefaultValue(),
     dataSource: this.buildRowsFromResults([]),
-    listViewDisplayed:
-      this.props.listViewDisplayed === "auto" ? false : this.props.listViewDisplayed
+    listViewDisplayed: this.props.listViewDisplayed === "auto" ? false : this.props.listViewDisplayed
   });
 
   setAddressText = address => this.setState({ text: address });
@@ -125,9 +125,7 @@ export default class GooglePlacesAutocomplete extends Component {
   };
 
   componentWillMount() {
-    this._request = this.props.debounce
-      ? debounce(this._request, this.props.debounce)
-      : this._request;
+    this._request = this.props.debounce ? debounce(this._request, this.props.debounce) : this._request;
   }
 
   componentDidMount() {
@@ -198,7 +196,7 @@ export default class GooglePlacesAutocomplete extends Component {
       };
     }
 
-    navigator.geolocation.getCurrentPosition(
+    Geolocation.getCurrentPosition(
       position => {
         if (this.props.nearbyPlacesAPI === "None") {
           let currentLocation = {
@@ -283,9 +281,7 @@ export default class GooglePlacesAutocomplete extends Component {
           this._disableRowLoaders();
 
           if (!this.props.onFail) {
-            console.warn(
-              "google places autocomplete: request could not be completed or has been aborted"
-            );
+            console.warn("google places autocomplete: request could not be completed or has been aborted");
           } else {
             this.props.onFail("request could not be completed or has been aborted");
           }
@@ -401,12 +397,7 @@ export default class GooglePlacesAutocomplete extends Component {
   _requestNearby = (latitude, longitude) => {
     this._abortRequests();
 
-    if (
-      latitude !== undefined &&
-      longitude !== undefined &&
-      latitude !== null &&
-      longitude !== null
-    ) {
+    if (latitude !== undefined && longitude !== undefined && latitude !== null && longitude !== null) {
       const request = new XMLHttpRequest();
       this._requests.push(request);
       request.timeout = this.props.timeout;
@@ -425,10 +416,7 @@ export default class GooglePlacesAutocomplete extends Component {
             if (this._isMounted === true) {
               var results = [];
               if (this.props.nearbyPlacesAPI === "GoogleReverseGeocoding") {
-                results = this._filterResultsByTypes(
-                  responseJSON.results,
-                  this.props.filterReverseGeocodingByTypes
-                );
+                results = this._filterResultsByTypes(responseJSON.results, this.props.filterReverseGeocodingByTypes);
               } else {
                 results = responseJSON.results;
               }
@@ -439,8 +427,7 @@ export default class GooglePlacesAutocomplete extends Component {
             }
           }
           if (typeof responseJSON.error_message !== "undefined") {
-            if (!this.props.onFail)
-              console.warn("google places autocomplete: " + responseJSON.error_message);
+            if (!this.props.onFail) console.warn("google places autocomplete: " + responseJSON.error_message);
             else {
               this.props.onFail(responseJSON.error_message);
             }
@@ -502,10 +489,7 @@ export default class GooglePlacesAutocomplete extends Component {
             if (this._isMounted === true) {
               const results =
                 this.props.nearbyPlacesAPI === "GoogleReverseGeocoding"
-                  ? this._filterResultsByTypes(
-                      responseJSON.predictions,
-                      this.props.filterReverseGeocodingByTypes
-                    )
+                  ? this._filterResultsByTypes(responseJSON.predictions, this.props.filterReverseGeocodingByTypes)
                   : responseJSON.predictions;
 
               this._results = results;
@@ -515,8 +499,7 @@ export default class GooglePlacesAutocomplete extends Component {
             }
           }
           if (typeof responseJSON.error_message !== "undefined") {
-            if (!this.props.onFail)
-              console.warn("google places autocomplete: " + responseJSON.error_message);
+            if (!this.props.onFail) console.warn("google places autocomplete: " + responseJSON.error_message);
             else {
               this.props.onFail(responseJSON.error_message);
             }
@@ -566,8 +549,7 @@ export default class GooglePlacesAutocomplete extends Component {
   _handleChangeText = text => {
     this._onChangeText(text);
 
-    const onChangeText =
-      this.props && this.props.textInputProps && this.props.textInputProps.onChangeText;
+    const onChangeText = this.props && this.props.textInputProps && this.props.textInputProps.onChangeText;
 
     if (onChangeText) {
       onChangeText(text);
@@ -608,12 +590,7 @@ export default class GooglePlacesAutocomplete extends Component {
   _renderLoader = rowData => {
     if (rowData.isLoading === true) {
       return (
-        <View
-          style={[
-            this.props.suppressDefaultStyles ? {} : defaultStyles.loader,
-            this.props.styles.loader
-          ]}
-        >
+        <View style={[this.props.suppressDefaultStyles ? {} : defaultStyles.loader, this.props.styles.loader]}>
           {this._getRowLoader()}
         </View>
       );
@@ -660,10 +637,7 @@ export default class GooglePlacesAutocomplete extends Component {
     return (
       <View
         key={`${sectionID}-${rowID}`}
-        style={[
-          this.props.suppressDefaultStyles ? {} : defaultStyles.separator,
-          this.props.styles.separator
-        ]}
+        style={[this.props.suppressDefaultStyles ? {} : defaultStyles.separator, this.props.styles.separator]}
       />
     );
   };
@@ -692,10 +666,7 @@ export default class GooglePlacesAutocomplete extends Component {
         ]}
       >
         <Image
-          style={[
-            this.props.suppressDefaultStyles ? {} : defaultStyles.powered,
-            this.props.styles.powered
-          ]}
+          style={[this.props.suppressDefaultStyles ? {} : defaultStyles.powered, this.props.styles.powered]}
           resizeMode="contain"
           source={require("./images/powered_by_google_on_white.png")}
         />
@@ -738,26 +709,19 @@ export default class GooglePlacesAutocomplete extends Component {
         .substr(2, 10);
 
     if (
-      (this.state.text !== "" ||
-        this.props.predefinedPlaces.length ||
-        this.props.currentLocation === true) &&
+      (this.state.text !== "" || this.props.predefinedPlaces.length || this.props.currentLocation === true) &&
       this.state.listViewDisplayed === true
     ) {
       return (
         <FlatList
           scrollEnabled={!this.props.disableScroll}
-          style={[
-            this.props.suppressDefaultStyles ? {} : defaultStyles.listView,
-            this.props.styles.listView
-          ]}
+          style={[this.props.suppressDefaultStyles ? {} : defaultStyles.listView, this.props.styles.listView]}
           data={this.state.dataSource}
           keyExtractor={keyGenerator}
           extraData={[this.state.dataSource, this.props]}
           ItemSeparatorComponent={this._renderSeparator}
           renderItem={({ item }) => this._renderRow(item)}
-          ListHeaderComponent={
-            this.props.renderHeaderComponent && this.props.renderHeaderComponent(this.state.text)
-          }
+          ListHeaderComponent={this.props.renderHeaderComponent && this.props.renderHeaderComponent(this.state.text)}
           ListFooterComponent={this._renderPoweredLogo}
           {...this.props}
         />
@@ -770,10 +734,7 @@ export default class GooglePlacesAutocomplete extends Component {
     let { onFocus, clearButtonMode, ...userProps } = this.props.textInputProps;
     return (
       <View
-        style={[
-          this.props.suppressDefaultStyles ? {} : defaultStyles.container,
-          this.props.styles.container
-        ]}
+        style={[this.props.suppressDefaultStyles ? {} : defaultStyles.container, this.props.styles.container]}
         pointerEvents="box-none"
       >
         {!this.props.textInputHide && (
@@ -790,10 +751,7 @@ export default class GooglePlacesAutocomplete extends Component {
               returnKeyType={this.props.returnKeyType}
               keyboardAppearance={this.props.keyboardAppearance}
               autoFocus={this.props.autoFocus}
-              style={[
-                this.props.suppressDefaultStyles ? {} : defaultStyles.textInput,
-                this.props.styles.textInput
-              ]}
+              style={[this.props.suppressDefaultStyles ? {} : defaultStyles.textInput, this.props.styles.textInput]}
               value={this.state.text}
               placeholder={this.props.placeholder}
               onSubmitEditing={this.props.onSubmitEditing}
