@@ -421,9 +421,8 @@ export default class GooglePlacesAutocomplete extends Component {
                 results = responseJSON.results;
               }
 
-              this.setState({
-                dataSource: this.buildRowsFromResults(results)
-              });
+              const dataSource = this.buildRowsFromResults(results);
+              this.setState({ dataSource, listViewDisplayed: true });
             }
           }
           if (typeof responseJSON.error_message !== "undefined") {
@@ -707,7 +706,6 @@ export default class GooglePlacesAutocomplete extends Component {
       Math.random()
         .toString(36)
         .substr(2, 10);
-
     if (
       (this.state.text !== "" || this.props.predefinedPlaces.length || this.props.currentLocation === true) &&
       this.state.listViewDisplayed === true
