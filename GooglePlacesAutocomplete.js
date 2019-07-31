@@ -305,16 +305,30 @@ export default class GooglePlacesAutocomplete extends Component {
 
       request.send();
     } else if (rowData.isCurrentLocation === true) {
-      // display loader
-      this._enableRowLoader(rowData);
+      const fetchLocation = rowData => {
+        // display loader
+        this._enableRowLoader(rowData);
 
-      this.setState({
-        text: this._renderDescription(rowData)
-      });
+        this.setState({
+          text: this._renderDescription(rowData)
+        });
 
-      this.triggerBlur(); // hide keyboard but not the results
-      delete rowData.isLoading;
-      this.getCurrentLocation();
+        this.triggerBlur(); // hide keyboard but not the results
+        delete rowData.isLoading;
+        this.getCurrentLocation();
+      };
+
+      if (typeof this.props.onCurrentLocationRowPressed === "function") {
+        this.props
+          .onCurrentLocationRowPressed()
+          .then(() => {
+            fetchLocation(rowData);
+          })
+          .catch(error => {});
+        return;
+      } else {
+        fetchLocation(rowData);
+      }
     } else {
       this.setState({
         text: this._renderDescription(rowData)
